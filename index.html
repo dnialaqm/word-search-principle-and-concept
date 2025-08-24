@@ -169,10 +169,16 @@
     const gridSize = 18;
     let grid = [];
     let usedCells = {};
+    // Updated directions array for all 8 directions
     const directions = [
-      [0, 1], [1, 0], [1, 1],
-      [0, -1], [-1, 0], [-1, -1],
-      [1, -1], [-1, 1]
+      [0, 1],  // Horizontal right
+      [0, -1], // Horizontal left
+      [1, 0],  // Vertical down
+      [-1, 0], // Vertical up
+      [1, 1],  // Diagonal down-right
+      [-1, -1], // Diagonal up-left
+      [1, -1],  // Diagonal down-left
+      [-1, 1]  // Diagonal up-right
     ];
 
     const gridContainer = document.getElementById("grid");
@@ -217,8 +223,14 @@
         }
       }
 
-      for (const word of words) placeWord(word);
+      // Place all words using the updated placement logic
+      for (const word of words) {
+        if (!placeWord(word)) {
+          console.warn(`Could not place word: ${word}`);
+        }
+      }
 
+      // Fill in remaining empty cells with random letters
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
           if (!grid[y][x].letter) {
@@ -250,7 +262,9 @@
         const startY = Math.floor(Math.random() * gridSize);
         let x = startX, y = startY;
         let fits = true;
+        let pathCells = [];
 
+        // Check if the word fits in the grid and doesn't overlap with other words in a conflicting way
         for (let j = 0; j < word.length; j++) {
           if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
             fits = false;
@@ -261,23 +275,21 @@
             fits = false;
             break;
           }
+          pathCells.push({x, y});
           x += dir[0];
           y += dir[1];
         }
 
         if (fits) {
-          x = startX;
-          y = startY;
-          for (let j = 0; j < word.length; j++) {
-            grid[y][x].letter = word[j];
-            usedCells[`${x},${y}`] = word;
-            x += dir[0];
-            y += dir[1];
-          }
+          // Place the word
+          pathCells.forEach((pos, index) => {
+            grid[pos.y][pos.x].letter = word[index];
+            usedCells[`${pos.x},${pos.y}`] = word;
+          });
           return true;
         }
       }
-      return false;
+      return false; // Failed to place word after all attempts
     }
 
     function formatTime(seconds) {
@@ -364,11 +376,13 @@
     gridContainer.addEventListener("touchstart", e => {
       const target = e.target;
       if (target.classList.contains("cell") && !target.classList.contains("found")) {
+        e.preventDefault(); // Prevent default touch behavior
         selecting = true;
         selectCell(target);
       }
     });
     gridContainer.addEventListener("touchmove", e => {
+      e.preventDefault(); // Prevent page scrolling
       const touch = e.touches[0];
       const element = document.elementFromPoint(touch.clientX, touch.clientY);
       if (element && element.classList.contains("cell") && !element.classList.contains("found")) {
@@ -391,4 +405,4 @@
     init();
   </script>
 </body>
-</html> 
+</html>
