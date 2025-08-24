@@ -1,4 +1,4 @@
-.<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -270,7 +270,7 @@
           y = startY;
           for (let j = 0; j < word.length; j++) {
             grid[y][x].letter = word[j];
-            usedCells[${x},${y}] = word;
+            usedCells[`${x},${y}`] = word;
             x += dir[0];
             y += dir[1];
           }
@@ -314,7 +314,7 @@
 
         if (foundWords.size === words.length) {
           clearInterval(timerInterval);
-          setTimeout(() => alert(🎉 Congrats! You found all words in ${formatTime(elapsed)} with a score of ${score}!), 100);
+          setTimeout(() => alert(`🎉 Congrats! You found all words in ${formatTime(elapsed)} with a score of ${score}!`), 100);
         }
       }
     }
@@ -331,7 +331,7 @@
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
           const cell = grid[y][x];
-          if (cell.letter === firstLetter && usedCells[${x},${y}] === word) {
+          if (cell.letter === firstLetter && usedCells[`${x},${y}`] === word) {
             cell.el.classList.add("hint");
             setTimeout(() => cell.el.classList.remove("hint"), 2000);
             return;
@@ -391,4 +391,4 @@
     init();
   </script>
 </body>
-</html>
+</html> 
