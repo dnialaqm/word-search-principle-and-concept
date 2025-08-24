@@ -32,7 +32,7 @@
     }
 
     .header {
-      background: #0081d4;
+      background: #138276;
       color: white;
       text-align: center;
       padding: 15px;
@@ -119,7 +119,7 @@
 
     .word-list-section h3 {
       text-align: center;
-      color: #0081d4;
+      color: #138276;
       margin: 0 0 10px 0;
     }
 
@@ -144,7 +144,7 @@
       text-align: center;
       margin-top: 15px;
       font-weight: bold;
-      color: #0081d4;
+      color: #138276;
     }
 
     .modal-overlay {
@@ -260,17 +260,7 @@
     const gridSize = 18;
     let grid = [];
     let usedCells = {};
-    const directions = [
-      [0, 1],
-      [0, -1],
-      [1, 0],
-      [-1, 0],
-      [1, 1],
-      [-1, -1],
-      [1, -1],
-      [-1, 1]
-    ];
-
+    
     const gridContainer = document.getElementById("grid");
     const wordListEl = document.getElementById("wordList");
     const foundCountEl = document.getElementById("foundCount");
@@ -283,10 +273,30 @@
     let selectedCells = [];
     let startCell = null;
 
+    // This is the fixed puzzle grid. Do not change this to keep the words in the same location.
+    const fixedGrid = [
+      ['R', 'E', 'S', 'P', 'O', 'N', 'S', 'I', 'B', 'I', 'L', 'I', 'T', 'Y', 'Q', 'W', 'E', 'R'],
+      ['A', 'N', 'D', 'O', 'M', 'L', 'E', 'F', 'R', 'A', 'N', 'D', 'O', 'M', 'S', 'D', 'F', 'G'],
+      ['K', 'L', 'P', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'W', 'Q', 'A', 'S', 'D', 'F', 'G', 'H'],
+      ['Q', 'R', 'E', 'L', 'I', 'A', 'B', 'I', 'L', 'I', 'T', 'Y', 'W', 'E', 'R', 'T', 'Y', 'U'],
+      ['N', 'D', 'O', 'M', 'S', 'T', 'R', 'N', 'I', 'N', 'G', 'S', 'D', 'F', 'G', 'H', 'J', 'K'],
+      ['Z', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'N', 'E', 'E', 'D', 'S', 'K', 'J'],
+      ['E', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I'],
+      ['R', 'B', 'C', 'V', 'B', 'N', 'M', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'W', 'E', 'R'],
+      ['O', 'X', 'Z', 'C', 'V', 'B', 'S', 'A', 'T', 'I', 'S', 'F', 'A', 'C', 'T', 'I', 'O', 'N'],
+      ['D', 'F', 'G', 'H', 'J', 'K', 'L', 'P', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'P', 'A', 'S'],
+      ['E', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'L', 'K', 'J', 'H', 'G', 'H', 'J'],
+      ['C', 'O', 'M', 'M', 'I', 'T', 'M', 'E', 'N', 'T', 'S', 'A', 'S', 'D', 'Q', 'W', 'E', 'S'],
+      ['E', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I'],
+      ['D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'A', 'S', 'D'],
+      ['T', 'Q', 'F', 'U', 'N', 'C', 'T', 'I', 'O', 'N', 'A', 'L', 'I', 'T', 'Y', 'H', 'J', 'K'],
+      ['X', 'Y', 'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'W', 'E', 'R', 'T'],
+      ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'U', 'I', 'O'],
+      ['H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Q', 'W', 'E', 'R', 'S', 'D', 'F']
+    ];
+
     function init() {
       foundWords.clear();
-      usedCells = {};
-      grid = [];
       selectedCells = [];
       selecting = false;
       startCell = null;
@@ -303,23 +313,13 @@
           cell.classList.add("cell");
           cell.dataset.x = x;
           cell.dataset.y = y;
-          grid[y][x] = { letter: "", el: cell };
+          grid[y][x] = { letter: fixedGrid[y][x], el: cell };
           gridContainer.appendChild(cell);
         }
       }
-
-      const shuffledWords = [...words].sort(() => 0.5 - Math.random());
-      for (const word of shuffledWords) {
-        if (!placeWord(word)) {
-          console.warn(`Could not place word: ${word}`);
-        }
-      }
-
+      
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
-          if (!grid[y][x].letter) {
-            grid[y][x].letter = String.fromCharCode(65 + Math.floor(Math.random() * 26));
-          }
           grid[y][x].el.textContent = grid[y][x].letter;
           grid[y][x].el.classList.remove("found", "selected");
         }
@@ -331,42 +331,6 @@
         li.dataset.word = word;
         wordListEl.appendChild(li);
       });
-    }
-
-    function placeWord(word) {
-      const attempts = 100;
-      for (let i = 0; i < attempts; i++) {
-        const dir = directions[Math.floor(Math.random() * directions.length)];
-        const startX = Math.floor(Math.random() * gridSize);
-        const startY = Math.floor(Math.random() * gridSize);
-        let x = startX, y = startY;
-        let fits = true;
-        let pathCells = [];
-
-        for (let j = 0; j < word.length; j++) {
-          if (x < 0 || x >= gridSize || y < 0 || y >= gridSize) {
-            fits = false;
-            break;
-          }
-          const cell = grid[y][x];
-          if (cell.letter && cell.letter !== word[j]) {
-            fits = false;
-            break;
-          }
-          pathCells.push({ x, y });
-          x += dir[0];
-          y += dir[1];
-        }
-
-        if (fits) {
-          pathCells.forEach((pos, index) => {
-            grid[pos.y][pos.x].letter = word[index];
-            usedCells[`${pos.x},${pos.y}`] = word;
-          });
-          return true;
-        }
-      }
-      return false;
     }
 
     function selectCell(cell) {
@@ -442,7 +406,7 @@
           const modalTitle = completionModal.querySelector('.modal-content h2');
           const modalText = completionModal.querySelector('.modal-content p');
           modalTitle.textContent = "🔑 Code Unlocked!";
-          modalText.innerHTML = "Congratulations, Quality Advocates! You've uncovered Infineon's 5 hidden Quality Principle and Concept- your key to crossing the digital bridge. <br><br> You escaped!";
+          modalText.innerHTML = "Congratulations, Quality Advocates! You've uncovered all 7 hidden Quality Principles and Concepts - your key to crossing the digital bridge. <br><br> You escaped!";
           completionModal.classList.add('show');
         }
       }
