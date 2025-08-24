@@ -306,26 +306,26 @@
     const foundSound = document.getElementById("foundSound");
     const timerEl = document.getElementById("timer");
 
-    // Fixed puzzle grid with new word positions
+    // Corrected fixed puzzle grid
     const fixedGrid = [
-      ['R', 'A', 'S', 'P', 'B', 'P', 'R', 'F', 'O', 'I', 'B', 'F', 'I', 'T', 'Y', 'W', 'E', 'R'],
-      ['S', 'E', 'D', 'O', 'M', 'L', 'E', 'F', 'R', 'A', 'N', 'D', 'O', 'M', 'S', 'D', 'F', 'G'],
-      ['A', 'L', 'I', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'W', 'Q', 'A', 'S', 'D', 'F', 'G', 'H'],
-      ['T', 'I', 'E', 'L', 'I', 'A', 'B', 'I', 'L', 'I', 'T', 'Y', 'W', 'E', 'R', 'T', 'Y', 'U'],
-      ['I', 'A', 'D', 'E', 'E', 'D', 'S', 'N', 'I', 'N', 'G', 'S', 'D', 'F', 'G', 'H', 'J', 'K'],
-      ['S', 'B', 'C', 'R', 'T', 'Y', 'N', 'U', 'I', 'O', 'P', 'N', 'E', 'E', 'D', 'S', 'K', 'J'],
-      ['F', 'I', 'F', 'C', 'T', 'I', 'O', 'N', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'I'],
-      ['A', 'L', 'U', 'F', 'C', 'T', 'I', 'O', 'N', 'A', 'L', 'I', 'T', 'Y', 'I', 'W', 'E', 'R'],
-      ['C', 'I', 'N', 'A', 'S', 'A', 'T', 'I', 'S', 'F', 'A', 'C', 'T', 'I', 'O', 'N', 'O', 'N'],
-      ['T', 'T', 'A', 'H', 'J', 'K', 'L', 'P', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'P', 'A', 'S'],
-      ['I', 'Y', 'S', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'L', 'K', 'J', 'H', 'G', 'H'],
-      ['O', 'C', 'O', 'M', 'M', 'I', 'T', 'M', 'E', 'N', 'T', 'S', 'A', 'S', 'D', 'Q', 'W', 'E'],
-      ['N', 'O', 'P', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I'],
-      ['Q', 'N', 'M', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'A', 'S', 'D'],
-      ['T', 'Q', 'F', 'U', 'N', 'C', 'T', 'I', 'O', 'N', 'A', 'L', 'I', 'T', 'Y', 'H', 'J', 'K'],
-      ['X', 'Y', 'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'W', 'E', 'R', 'T'],
-      ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'U', 'I', 'O'],
-      ['H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Q', 'W', 'E', 'R', 'S', 'D', 'F']
+      ['W', 'R', 'F', 'O', 'M', 'C', 'O', 'M', 'M', 'I', 'T', 'M', 'E', 'N', 'T', 'S', 'A', 'S'],
+      ['C', 'E', 'L', 'I', 'M', 'N', 'D', 'H', 'U', 'M', 'G', 'F', 'N', 'W', 'P', 'J', 'S', 'S'],
+      ['P', 'S', 'L', 'Q', 'B', 'P', 'L', 'I', 'F', 'W', 'Y', 'C', 'N', 'O', 'Q', 'A', 'U', 'R'],
+      ['N', 'P', 'R', 'E', 'L', 'I', 'A', 'B', 'I', 'L', 'I', 'T', 'Y', 'U', 'V', 'K', 'J', 'G'],
+      ['M', 'O', 'I', 'R', 'F', 'C', 'C', 'O', 'M', 'O', 'P', 'P', 'T', 'M', 'V', 'O', 'E', 'N'],
+      ['O', 'N', 'E', 'N', 'T', 'W', 'U', 'N', 'I', 'O', 'T', 'M', 'I', 'P', 'S', 'N', 'A', 'A'],
+      ['A', 'S', 'A', 'V', 'S', 'S', 'I', 'R', 'T', 'I', 'O', 'N', 'Y', 'A', 'D', 'E', 'D', 'L'],
+      ['Z', 'O', 'T', 'V', 'C', 'D', 'D', 'E', 'L', 'L', 'I', 'B', 'T', 'R', 'E', 'E', 'C', 'I'],
+      ['E', 'D', 'I', 'T', 'A', 'S', 'E', 'B', 'P', 'O', 'I', 'I', 'O', 'U', 'I', 'D', 'T', 'T'],
+      ['R', 'I', 'C', 'D', 'A', 'F', 'U', 'N', 'C', 'T', 'I', 'O', 'N', 'A', 'L', 'I', 'T', 'Y'],
+      ['O', 'O', 'Y', 'M', 'T', 'T', 'N', 'A', 'E', 'L', 'N', 'I', 'I', 'C', 'A', 'F', 'I', 'O'],
+      ['D', 'C', 'E', 'L', 'F', 'S', 'O', 'N', 'L', 'M', 'O', 'O', 'A', 'C', 'S', 'T', 'O', 'N'],
+      ['E', 'E', 'C', 'V', 'I', 'A', 'N', 'E', 'C', 'E', 'A', 'N', 'S', 'C', 'I', 'I', 'N', 'A'],
+      ['F', 'C', 'T', 'Q', 'O', 'B', 'A', 'L', 'I', 'T', 'C', 'F', 'D', 'L', 'V', 'S', 'A', 'L'],
+      ['E', 'P', 'I', 'N', 'N', 'L', 'T', 'A', 'O', 'I', 'P', 'N', 'N', 'E', 'S', 'C', 'I', 'I'],
+      ['C', 'Q', 'O', 'M', 'S', 'E', 'I', 'A', 'U', 'V', 'Y', 'A', 'E', 'I', 'A', 'U', 'Y', 'T'],
+      ['T', 'Y', 'Z', 'S', 'L', 'C', 'O', 'M', 'M', 'I', 'T', 'C', 'D', 'L', 'S', 'A', 'D', 'F'],
+      ['V', 'Q', 'W', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'D', 'I', 'V', 'O', 'G', 'I', 'N']
     ];
 
     function startTimer() {
@@ -363,7 +363,6 @@
         }
       }
       
-      // Update grid display after word placement
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
           grid[y][x].el.textContent = grid[y][x].letter;
