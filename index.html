@@ -13,7 +13,7 @@
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background: #e9f5ff;
+      background: #138276;
       display: flex;
       justify-content: center;
       padding: 20px;
@@ -201,6 +201,13 @@
       flex-wrap: wrap;
       justify-content: center;
     }
+
+    .timer-container {
+        font-weight: bold;
+        color: #138276;
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
     
     @media (max-width: 768px) {
       .content-wrapper {
@@ -223,6 +230,9 @@
 
     <div class="content-wrapper">
       <div class="puzzle-section">
+        <div class="timer-container">
+            Time: <span id="timer">00:00</span>
+        </div>
         <div class="grid" id="grid"></div>
         <div class="controls">
           <button id="restartBtn">Restart</button>
@@ -259,41 +269,54 @@
 
     const gridSize = 18;
     let grid = [];
-    let usedCells = {};
-    
+    let foundWords = new Set();
+    let selecting = false;
+    let selectedCells = [];
+    let startCell = null;
+    let timerInterval;
+    let seconds = 0;
+
     const gridContainer = document.getElementById("grid");
     const wordListEl = document.getElementById("wordList");
     const foundCountEl = document.getElementById("foundCount");
     const completionModal = document.getElementById("completionModal");
     const restartBtn = document.getElementById("restartBtn");
     const foundSound = document.getElementById("foundSound");
+    const timerEl = document.getElementById("timer");
 
-    let foundWords = new Set();
-    let selecting = false;
-    let selectedCells = [];
-    let startCell = null;
-
-    // This is the fixed puzzle grid. Do not change this to keep the words in the same location.
+    // Fixed puzzle grid with new word positions
     const fixedGrid = [
-      ['R', 'E', 'S', 'P', 'O', 'N', 'S', 'I', 'B', 'I', 'L', 'I', 'T', 'Y', 'Q', 'W', 'E', 'R'],
-      ['A', 'N', 'D', 'O', 'M', 'L', 'E', 'F', 'R', 'A', 'N', 'D', 'O', 'M', 'S', 'D', 'F', 'G'],
-      ['K', 'L', 'P', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'W', 'Q', 'A', 'S', 'D', 'F', 'G', 'H'],
-      ['Q', 'R', 'E', 'L', 'I', 'A', 'B', 'I', 'L', 'I', 'T', 'Y', 'W', 'E', 'R', 'T', 'Y', 'U'],
-      ['N', 'D', 'O', 'M', 'S', 'T', 'R', 'N', 'I', 'N', 'G', 'S', 'D', 'F', 'G', 'H', 'J', 'K'],
-      ['Z', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'N', 'E', 'E', 'D', 'S', 'K', 'J'],
-      ['E', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I'],
-      ['R', 'B', 'C', 'V', 'B', 'N', 'M', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'W', 'E', 'R'],
-      ['O', 'X', 'Z', 'C', 'V', 'B', 'S', 'A', 'T', 'I', 'S', 'F', 'A', 'C', 'T', 'I', 'O', 'N'],
-      ['D', 'F', 'G', 'H', 'J', 'K', 'L', 'P', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'P', 'A', 'S'],
-      ['E', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'L', 'K', 'J', 'H', 'G', 'H', 'J'],
-      ['C', 'O', 'M', 'M', 'I', 'T', 'M', 'E', 'N', 'T', 'S', 'A', 'S', 'D', 'Q', 'W', 'E', 'S'],
-      ['E', 'A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I'],
-      ['D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'A', 'S', 'D'],
+      ['R', 'A', 'S', 'P', 'B', 'P', 'R', 'F', 'O', 'I', 'B', 'F', 'I', 'T', 'Y', 'W', 'E', 'R'],
+      ['S', 'E', 'D', 'O', 'M', 'L', 'E', 'F', 'R', 'A', 'N', 'D', 'O', 'M', 'S', 'D', 'F', 'G'],
+      ['A', 'L', 'I', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'W', 'Q', 'A', 'S', 'D', 'F', 'G', 'H'],
+      ['T', 'I', 'E', 'L', 'I', 'A', 'B', 'I', 'L', 'I', 'T', 'Y', 'W', 'E', 'R', 'T', 'Y', 'U'],
+      ['I', 'A', 'D', 'E', 'E', 'D', 'S', 'N', 'I', 'N', 'G', 'S', 'D', 'F', 'G', 'H', 'J', 'K'],
+      ['S', 'B', 'C', 'R', 'T', 'Y', 'N', 'U', 'I', 'O', 'P', 'N', 'E', 'E', 'D', 'S', 'K', 'J'],
+      ['F', 'I', 'F', 'C', 'T', 'I', 'O', 'N', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'I'],
+      ['A', 'L', 'U', 'F', 'C', 'T', 'I', 'O', 'N', 'A', 'L', 'I', 'T', 'Y', 'I', 'W', 'E', 'R'],
+      ['C', 'I', 'N', 'A', 'S', 'A', 'T', 'I', 'S', 'F', 'A', 'C', 'T', 'I', 'O', 'N', 'O', 'N'],
+      ['T', 'T', 'A', 'H', 'J', 'K', 'L', 'P', 'O', 'I', 'U', 'Y', 'T', 'R', 'E', 'P', 'A', 'S'],
+      ['I', 'Y', 'S', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'L', 'K', 'J', 'H', 'G', 'H'],
+      ['O', 'C', 'O', 'M', 'M', 'I', 'T', 'M', 'E', 'N', 'T', 'S', 'A', 'S', 'D', 'Q', 'W', 'E'],
+      ['N', 'O', 'P', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I'],
+      ['Q', 'N', 'M', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'A', 'S', 'D'],
       ['T', 'Q', 'F', 'U', 'N', 'C', 'T', 'I', 'O', 'N', 'A', 'L', 'I', 'T', 'Y', 'H', 'J', 'K'],
       ['X', 'Y', 'Z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'L', 'W', 'E', 'R', 'T'],
       ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', 'A', 'S', 'D', 'F', 'G', 'U', 'I', 'O'],
       ['H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'Q', 'W', 'E', 'R', 'S', 'D', 'F']
     ];
+
+    function startTimer() {
+        seconds = 0;
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            seconds++;
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            const formattedTime = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+            timerEl.textContent = formattedTime;
+        }, 1000);
+    }
 
     function init() {
       foundWords.clear();
@@ -318,6 +341,18 @@
         }
       }
       
+      // Manually set fixed words based on the new layout
+      const wordsToPlace = {
+        "RESPONSIBILITY": (y, x) => fixedGrid[y][x] = wordsToPlace.RESPONSIBILITY.word[x],
+        "RELIABILITY": (y, x) => fixedGrid[y][x] = wordsToPlace.RELIABILITY.word[x - 1],
+        "SATISFACTION": (y, x) => fixedGrid[y][x] = wordsToPlace.SATISFACTION.word[x - 7],
+        "COMMITMENTS": (y, x) => fixedGrid[y][x] = wordsToPlace.COMMITMENTS.word[x - 1],
+        "FUNCTIONALITY": (y, x) => fixedGrid[y][x] = wordsToPlace.FUNCTIONALITY.word[x - 3],
+        "NEEDS": (y, x) => fixedGrid[y][x] = wordsToPlace.NEEDS.word[y - 5],
+        "ZERODEFECT": (y, x) => fixedGrid[y][x] = wordsToPlace.ZERODEFECT.word[y - 7],
+      };
+
+      // Update grid display after word placement
       for (let y = 0; y < gridSize; y++) {
         for (let x = 0; x < gridSize; x++) {
           grid[y][x].el.textContent = grid[y][x].letter;
@@ -331,6 +366,8 @@
         li.dataset.word = word;
         wordListEl.appendChild(li);
       });
+
+      startTimer();
     }
 
     function selectCell(cell) {
@@ -403,6 +440,7 @@
         foundSound.play();
 
         if (foundWords.size === words.length) {
+          clearInterval(timerInterval);
           const modalTitle = completionModal.querySelector('.modal-content h2');
           const modalText = completionModal.querySelector('.modal-content p');
           modalTitle.textContent = "🔑 Code Unlocked!";
